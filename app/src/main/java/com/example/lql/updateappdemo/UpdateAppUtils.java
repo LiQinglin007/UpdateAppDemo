@@ -18,6 +18,8 @@ import com.example.lql.updateappdemo.utils.T;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.lang.ref.WeakReference;
+
 
 /**
  * 类描述：版本更新工具类
@@ -119,7 +121,8 @@ public class UpdateAppUtils {
                         //这里涉及到下载的强制更新，是不是强制更新   强制更新，点取消按钮，退出程序
                         if (isUpdate) {
                             T.shortToast(mContext, "此版本需要更新，程序即将退出");
-                            mHandler.sendEmptyMessageDelayed(0, 1000 * 3);
+                            MyHandler myHandler = new MyHandler(new UpdateAppUtils());
+                            myHandler.sendEmptyMessageDelayed(0, 1000 * 3);
                         } else {
                             PreferenceUtils.setInt(FinalData.VERSIONCODE, versionCode);
                             dialog.dismiss();
@@ -130,19 +133,24 @@ public class UpdateAppUtils {
         dialog.show();
     }
 
+    static class MyHandler extends Handler {
+        WeakReference<UpdateAppUtils> mWeakReference;
 
-    static Handler mHandler = new Handler() {
+        public MyHandler(UpdateAppUtils mUpdateAppUtils) {
+            mWeakReference = new WeakReference<UpdateAppUtils>(mUpdateAppUtils);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            exitApp();
+            mWeakReference.get().exitApp();
         }
-    };
+    }
 
     /**
      * 这里使用EventBus像Activity发送消息，当然你也可以使用广播
      */
-    private static void exitApp() {
+    private void exitApp() {
         EventBus.getDefault().post(new ExitappMessage(""));
     }
 

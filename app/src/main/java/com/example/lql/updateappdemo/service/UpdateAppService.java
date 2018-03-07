@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import com.example.lql.updateappdemo.utils.PublicStaticData;
@@ -22,7 +23,7 @@ import java.io.File;
  * 类描述：下载服务
  * 作  者：李清林
  * 时  间：
- * 修改备注：
+ * 修改备注：兼容7.0
  */
 public class UpdateAppService extends Service {
 
@@ -38,7 +39,6 @@ public class UpdateAppService extends Service {
 
     /** 初始化下载器 **/
     private void initDownManager() {
-
         manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         receiver = new DownloadCompleteReceiver();
 
@@ -82,7 +82,6 @@ public class UpdateAppService extends Service {
 
     @Override
     public void onDestroy() {
-
         // 注销下载广播
         if (receiver != null)
             unregisterReceiver(receiver);
@@ -91,10 +90,8 @@ public class UpdateAppService extends Service {
 
     // 接受下载完成后的intent
     class DownloadCompleteReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
-
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 DownloadManager.Query query = new DownloadManager.Query();
@@ -103,10 +100,20 @@ public class UpdateAppService extends Service {
                 query.setFilterById(id);
                 Cursor c = manager.query(query);
                 if (c.moveToFirst()) {
-                    String filename = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME));
-                    if (null!=filename&&!TextUtils.isEmpty(filename)) {
-
-                        install1(context, filename);
+                    int fileUriIdx = c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI);
+                    String fileUri = c.getString(fileUriIdx);
+                    String fileName = null;
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                        if (fileUri != null) {
+                            fileName = Uri.parse(fileUri).getPath();
+                        }
+                    } else {
+                        //Android 7.0以上的方式：请求获取写入权限，这一步报错
+                        int fileNameIdx = c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
+                        fileName = c.getString(fileNameIdx);
+                    }
+                    if (null!=fileName&&!TextUtils.isEmpty(fileName)) {
+                        install1(context, fileName);
                     }
                     //停止服务并关闭广播
                     UpdateAppService.this.stopSelf();
@@ -118,8 +125,15 @@ public class UpdateAppService extends Service {
             Intent i = new Intent(Intent.ACTION_VIEW);
             File file = new File(filePath);
             if (file != null && file.length() > 0 && file.exists() && file.isFile()) {
-                i.setDataAndType(Uri.parse("file://" + filePath), "application/vnd.android.package-archive");
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //判断是否是AndroidN以及更高的版本
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Uri contentUri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", file);
+                    i.setDataAndType(contentUri, "application/vnd.android.package-archive");
+                } else {
+                    i.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
                 context.startActivity(i);
                 return true;
             }

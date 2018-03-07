@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         String url = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
         String Version_name = "1.1";//版本名称
         String info = "模拟下载，使用QQApk";  //更新说明
-        int Forced = 0;// 1：强制更新   0：不是
+        int Forced = 1;// 1：强制更新   0：不是
         int Version_no = 2;//版本号
         UpdateAppUtils.UpdateApp(MainActivity.this, Version_no, Version_name, info,
                 url, Forced == 1 ? true : false, true);
