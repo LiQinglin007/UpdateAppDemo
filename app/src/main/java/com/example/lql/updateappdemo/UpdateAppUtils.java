@@ -9,11 +9,10 @@ import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Message;
 
-import com.example.lql.updateappdemo.message.ExitappMessage;
+import com.example.lql.updateappdemo.message.EventMessage;
 import com.example.lql.updateappdemo.service.UpdateAppService;
 import com.example.lql.updateappdemo.utils.FinalData;
 import com.example.lql.updateappdemo.utils.PreferenceUtils;
-import com.example.lql.updateappdemo.utils.PublicStaticData;
 import com.example.lql.updateappdemo.utils.T;
 
 import org.greenrobot.eventbus.EventBus;
@@ -107,9 +106,10 @@ public class UpdateAppUtils {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                PublicStaticData.downLoadUrl = downloadurl;
+                                EventBus.getDefault().post(new EventMessage(EventMessage.CheckApp, true));
                                 //启动服务
                                 Intent service = new Intent(mContext, UpdateAppService.class);
+                                service.putExtra("downLoadUrl", downloadurl);
                                 mContext.startService(service);
                             }
                         }).start();
@@ -151,7 +151,7 @@ public class UpdateAppUtils {
      * 这里使用EventBus像Activity发送消息，当然你也可以使用广播
      */
     private void exitApp() {
-        EventBus.getDefault().post(new ExitappMessage(""));
+        EventBus.getDefault().post(new EventMessage(EventMessage.Exitapp));
     }
 
 

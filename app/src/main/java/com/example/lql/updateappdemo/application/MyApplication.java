@@ -14,8 +14,6 @@ import com.example.lql.updateappdemo.utils.PublicStaticData;
  * 修改备注：
  */
 public class MyApplication extends Application {
-
-
     private static MyApplication mContext;
     public static Context context;
 
@@ -30,7 +28,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         getInstance();
         PublicStaticData.mySharedPreferences = getSharedPreferences("UpdateDemo_App", Activity.MODE_PRIVATE);//初始化PreferencesUtils
-        context=getApplicationContext();
+        context = getApplicationContext();
         super.onCreate();
     }
 }

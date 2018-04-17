@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.example.lql.updateappdemo.R;
 import com.example.lql.updateappdemo.UpdateAppUtils;
-import com.example.lql.updateappdemo.message.ExitappMessage;
+import com.example.lql.updateappdemo.message.EventMessage;
 import com.example.lql.updateappdemo.utils.T;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     Button checkVersion;
 
+    boolean IsDownLoad = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +44,25 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         checkVersion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //注意这里正常情况下，下载完成之后，安装了新的安装包，IsDownLoad就变成false了，
+                //因为这里下载的不是这个apk,所以会有这个问题，以后会放一个apk在线上，
+                // 改成下载当前项目的apk,就不会这样了
+                if (IsDownLoad) {
+                    T.shortToast(MainActivity.this, "正在更新，请稍后");
+                    return;
+                }
                 chackPermission();
             }
         });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onExitappEvent(ExitappMessage messageEvent) {
-        T.shortToast(MainActivity.this, "去处理退出app的方法");
+    public void onExitappEvent(EventMessage messageEvent) {
+        if (messageEvent.getMessageType() == EventMessage.Exitapp) {
+            T.shortToast(MainActivity.this, "去处理退出app的方法");
+        } else if (messageEvent.getMessageType() == EventMessage.CheckApp) {
+            IsDownLoad = messageEvent.isDownLoading();
+        }
     }
 
     /**

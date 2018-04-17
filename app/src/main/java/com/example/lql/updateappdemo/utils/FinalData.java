@@ -7,6 +7,5 @@ package com.example.lql.updateappdemo.utils;
  * 修改备注：
  */
 public class FinalData {
-    public  final static String VERSIONCODE ="VERSIONCODE";//忽略的版本号
-    public final static String EXITAPP = "COM.EXAMOPLE.LQL.SMARTHOME.EXITAPP";//退出App的广播
+    public final static String VERSIONCODE = "VERSIONCODE";//忽略的版本号
 }

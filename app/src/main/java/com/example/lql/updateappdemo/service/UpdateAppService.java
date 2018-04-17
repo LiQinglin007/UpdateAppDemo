@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
+import com.example.lql.updateappdemo.R;
 import com.example.lql.updateappdemo.utils.PublicStaticData;
 import com.example.lql.updateappdemo.utils.T;
 
@@ -31,26 +32,32 @@ public class UpdateAppService extends Service {
 
     }
 
-    /** 安卓系统下载类 **/
+    /**
+     * 安卓系统下载类
+     **/
     DownloadManager manager;
 
-    /** 接收下载完的广播 **/
+    /**
+     * 接收下载完的广播
+     **/
     DownloadCompleteReceiver receiver;
 
-    /** 初始化下载器 **/
-    private void initDownManager() {
+    /**
+     * 初始化下载器
+     **/
+    private void initDownManager(String downLoadUrl) {
         manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         receiver = new DownloadCompleteReceiver();
 
-        if(TextUtils.isEmpty(PublicStaticData.downLoadUrl)){
-            T.shortToast(UpdateAppService.this,"下载地址为空");
+        if (TextUtils.isEmpty(downLoadUrl)) {
+            T.shortToast(UpdateAppService.this, "下载地址为空");
             return;
         }
 
         //设置下载地址
-        String urlPath = PublicStaticData.downLoadUrl;
-        Uri parse = Uri.parse(urlPath);
+        Uri parse = Uri.parse(downLoadUrl);
         DownloadManager.Request down = new DownloadManager.Request(parse);
+        down.setTitle(getResources().getString(R.string.app_name) + ".apk");
         // 设置允许使用的网络类型，这里是移动网络和wifi都可以
         down.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
         // 下载时，通知栏显示途中
@@ -70,8 +77,9 @@ public class UpdateAppService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String downLoadUrl = intent.getStringExtra("downLoadUrl");
         // 调用下载
-        initDownManager();
+        initDownManager(downLoadUrl);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -112,7 +120,7 @@ public class UpdateAppService extends Service {
                         int fileNameIdx = c.getColumnIndex(DownloadManager.COLUMN_LOCAL_FILENAME);
                         fileName = c.getString(fileNameIdx);
                     }
-                    if (null!=fileName&&!TextUtils.isEmpty(fileName)) {
+                    if (null != fileName && !TextUtils.isEmpty(fileName)) {
                         install1(context, fileName);
                     }
                     //停止服务并关闭广播
@@ -121,7 +129,7 @@ public class UpdateAppService extends Service {
             }
         }
 
-        private  boolean install1(Context context, String filePath) {
+        private boolean install1(Context context, String filePath) {
             Intent i = new Intent(Intent.ACTION_VIEW);
             File file = new File(filePath);
             if (file != null && file.length() > 0 && file.exists() && file.isFile()) {
