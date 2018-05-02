@@ -130,8 +130,11 @@ public class UpdateAppUtils {
                                     getPermissionDialog();
                                 } else {
                                     // 申请授权
-                                    ActivityCompat.requestPermissions(mActivity,
-                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_SDCARD_6_0);
+                                    if (mFragment != null)
+                                        mFragment.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_SDCARD_6_0);
+                                    else
+                                        ActivityCompat.requestPermissions(mActivity,
+                                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_SDCARD_6_0);
                                 }
                             }
                         } else {
