@@ -91,12 +91,16 @@ public class UpdateAppService extends Service {
     @Override
     public void onDestroy() {
         // 注销下载广播
-        if (receiver != null)
+        if (receiver != null) {
             unregisterReceiver(receiver);
+        }
         super.onDestroy();
     }
 
-    // 接受下载完成后的intent
+
+    /**
+     * 接受下载完成后的intent
+     */
     class DownloadCompleteReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
