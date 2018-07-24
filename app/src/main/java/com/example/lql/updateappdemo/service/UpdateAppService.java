@@ -15,7 +15,6 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 
 import com.example.lql.updateappdemo.R;
-import com.example.lql.updateappdemo.utils.PublicStaticData;
 import com.example.lql.updateappdemo.utils.T;
 
 import java.io.File;

@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.lql.updateappdemo">
+    package="com.example.lql.updateappdemo">
 
-    <!--读区存储的权限-->
+    <!--读存储的权限-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!--写区存储的权限-->
+    <!--写存储的权限-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <!--8.0未知来源的应用权限 更新App-->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
 
     <application
         android:name=".application.MyApplication"
@@ -33,15 +31,13 @@
 
         <activity android:name=".ui.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".service.UpdateAppService"
-                 android:enabled="true"></service>
-
+        <service
+            android:name=".service.UpdateAppService"
+            android:enabled="true"></service>
     </application>
-
 </manifest>
