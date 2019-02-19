@@ -104,8 +104,6 @@ public class HomeFragment extends Fragment {
             if (messageEvent.getMessageString().equals(PublicStaticData.downloadUrl)) {
                 //拿到下载id
                 downloadId = messageEvent.getMessageLong();
-                //开始下载
-                IsDownLoad = messageEvent.isDownLoading();
             }
         } else if (messageEvent.getMessageType() == EventMessage.DOWNLOAD_FAIL) {
             if (messageEvent.getMessageString().equals(PublicStaticData.downloadUrl)) {
