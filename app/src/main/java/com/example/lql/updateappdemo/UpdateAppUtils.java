@@ -21,7 +21,7 @@ import android.support.v4.content.ContextCompat;
 
 
 import com.example.lql.updateappdemo.message.EventMessage;
-import com.example.lql.updateappdemo.service.UpdateAppService;
+import com.example.lql.updateappdemo.service.DownloadService;
 import com.example.lql.updateappdemo.utils.FinalData;
 import com.example.lql.updateappdemo.utils.PreferenceUtils;
 import com.example.lql.updateappdemo.utils.T;
@@ -230,13 +230,14 @@ public class UpdateAppUtils {
     private static void downLoad() {
         T.shortToast(mActivity, "正在下载...");
         //如果要更新，并且是强制更新，这里发一个事件，不让其他的页面做操作了
-        EventBus.getDefault().post(new EventMessage(EventMessage.CheckApp, true));
+        EventBus.getDefault().post(new EventMessage(EventMessage.CHECK_APP, true));
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //启动服务
-                Intent service = new Intent(mActivity, UpdateAppService.class);
-                service.putExtra("downLoadUrl", mDownloadUrl);
+                Intent service = new Intent(mActivity, DownloadService.class);
+                service.putExtra(FinalData.DOWNLOAD_URL, mDownloadUrl);
+                service.putExtra(FinalData.DOWNLOAD_TITLE, mActivity.getResources().getString(R.string.app_name) + ".apk");
                 mActivity.startService(service);
             }
         }).start();
@@ -349,6 +350,6 @@ public class UpdateAppUtils {
      * 这里使用EventBus像Activity发送消息，当然你也可以使用广播
      */
     private static void exitApp() {
-        EventBus.getDefault().post(new EventMessage(EventMessage.Exitapp));
+        EventBus.getDefault().post(new EventMessage(EventMessage.EXIT_APP));
     }
 }

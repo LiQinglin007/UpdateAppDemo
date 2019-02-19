@@ -1,11 +1,23 @@
 package com.example.lql.updateappdemo.utils;
 
 /**
- * 类描述：
- * 作  者：LQL
- * 时  间：2017/6/2
- * 修改备注：
+ * @describe：存储常量<br>
+ * @author：Xiaomi<br>
+ * @createTime：2018/3/23<br>
+ * @remarks：<br>
+ * @changeTime:<br>
  */
 public class FinalData {
-    public final static String VERSIONCODE = "VERSIONCODE";//忽略的版本号
+    /**
+     * 忽略的版本号
+     */
+    public final static String VERSIONCODE = "VERSIONCODE";
+    /**
+     * 下载地址
+     */
+    public static final String DOWNLOAD_URL = "DOWNLOAD_URL";
+    /**
+     * 下载title
+     */
+    public static final String DOWNLOAD_TITLE = "DOWNLOAD_TITLE";
 }

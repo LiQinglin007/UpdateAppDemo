@@ -10,4 +10,5 @@ import android.content.SharedPreferences;
  */
 public class PublicStaticData {
     public static SharedPreferences mySharedPreferences;//SharedPreferences存储
+    public static String downloadUrl="";
 }

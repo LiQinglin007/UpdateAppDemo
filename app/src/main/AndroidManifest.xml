@@ -35,9 +35,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".service.UpdateAppService"
-            android:enabled="true"></service>
+        <service android:name=".service.DownloadService"></service>
     </application>
 </manifest>

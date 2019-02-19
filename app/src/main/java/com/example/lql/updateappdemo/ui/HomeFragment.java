@@ -13,6 +13,8 @@ import android.widget.Button;
 import com.example.lql.updateappdemo.R;
 import com.example.lql.updateappdemo.UpdateAppUtils;
 import com.example.lql.updateappdemo.message.EventMessage;
+import com.example.lql.updateappdemo.service.DownloadService;
+import com.example.lql.updateappdemo.utils.PublicStaticData;
 import com.example.lql.updateappdemo.utils.T;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,6 +31,31 @@ public class HomeFragment extends Fragment {
     View mRootView = null;
     Button checkVersion;
     boolean IsDownLoad = false;
+
+    /**
+     * 下载地址
+     */
+    String url = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
+    /**
+     * 版本名称
+     */
+    String Version_name = "1.1";
+    /**
+     * 更新说明
+     */
+    String info = "模拟下载，使用QQApk";
+    /**
+     * 1：强制更新   0：不是
+     */
+    int Forced = 1;
+    /**
+     * 版本号
+     */
+    int Version_no = 2;
+    /**
+     * 下载id
+     */
+    long downloadId = -1;
 
     public static HomeFragment getInstance() {
         return HomeFragmentHolder.homeFragment;
@@ -69,22 +96,33 @@ public class HomeFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onExitappEvent(EventMessage messageEvent) {
-        if (messageEvent.getMessageType() == EventMessage.Exitapp) {
+        if (messageEvent.getMessageType() == EventMessage.EXIT_APP) {
             T.shortToast(getActivity(), "去处理退出app的方法");
-        } else if (messageEvent.getMessageType() == EventMessage.CheckApp) {
+        } else if (messageEvent.getMessageType() == EventMessage.CHECK_APP) {
             IsDownLoad = messageEvent.isDownLoading();
+        } else if (messageEvent.getMessageType() == EventMessage.DOWNLOAD_START) {
+            if (messageEvent.getMessageString().equals(PublicStaticData.downloadUrl)) {
+                //拿到下载id
+                downloadId = messageEvent.getMessageLong();
+                //开始下载
+                IsDownLoad = messageEvent.isDownLoading();
+            }
+        } else if (messageEvent.getMessageType() == EventMessage.DOWNLOAD_FAIL) {
+            if (messageEvent.getMessageString().equals(PublicStaticData.downloadUrl)) {
+                //下载失败
+                T.longToast(getActivity(), "下载失败");
+                downloadId = -1;
+                IsDownLoad = false;
+            }
         }
     }
 
-
+    /**
+     * 发起网络请求，获取版本信息数据(模拟)
+     */
     private void getData() {
-        String url = "https://qd.myapp.com/myapp/qqteam/AndroidQQ/mobileqq_android.apk";
-        String Version_name = "1.1";//版本名称
-        String info = "模拟下载，使用QQApk";  //更新说明
-        int Forced = 1;// 1：强制更新   0：不是
-        int Version_no = 2;//版本号
         UpdateAppUtils.UpdateApp(getActivity(), HomeFragment.getInstance(), Version_no, Version_name, info,
-                url, Forced == 1 ? true : false, true);
+                PublicStaticData.downloadUrl, Forced == 1 ? true : false, true);
     }
 
     @Override
@@ -92,7 +130,8 @@ public class HomeFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         //如果是从设置界面返回,就继续判断权限
         if (requestCode == UpdateAppUtils.REQUEST_PERMISSION_SDCARD_SETTING) {
-            getData();
+            UpdateAppUtils.UpdateApp(getActivity(), HomeFragment.getInstance(), Version_no, Version_name, info,
+                    PublicStaticData.downloadUrl, Forced == 1 ? true : false, true);
         }
     }
 
@@ -107,5 +146,8 @@ public class HomeFragment extends Fragment {
         super.onDestroy();
         //取消注册事件
         EventBus.getDefault().unregister(this);
+        if (downloadId != -1) {
+            DownloadService.cancleDownload(downloadId);
+        }
     }
 }
